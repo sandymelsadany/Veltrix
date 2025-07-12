@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veltrix - Modern Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .router-outlet {
+            min-height: calc(100vh - 80px);
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-icon {
+            margin-right: 0;
+        }
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+            margin-left: 250px;
+        }
+        .card {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+        }
+        .dark .card {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+        .dark .form-control {
+            background-color: #374151;
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(129, 140, 248, 0.25);
+        }
+        .dark .input-group-text {
+            background-color: #4B5563;
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .nav-link.active {
+            background-color: rgba(79, 70, 229, 0.2);
+        }
+        .dark .nav-link:hover:not(.active) {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        .dark .dropdown-menu {
+            background-color: #1F2937;
+            border-color: #4B5563;
+        }
+        .dark .dropdown-item {
+            color: #F3F4F6;
+        }
+        .dark .dropdown-item:hover {
+            background-color: #374151;
+        }
+        .dark .table {
+            color: #F3F4F6;
+        }
+        .dark .table th {
+            background-color: #374151;
+            border-color: #4B5563;
+        }
+        .dark .table td {
+            border-color: #4B5563;
+        }
+        .dark .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .dark .bg-light {
+            background-color: #374151 !important;
+        }
+        .dark .text-dark {
+            color: #F3F4F6 !important;
+        }
+        .dark .border {
+            border-color: #4B5563 !important;
+        }
+        .dark .btn-outline-secondary {
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .btn-outline-secondary:hover {
+            background-color: #4B5563;
+            border-color: #4B5563;
+        }
+        .dark .card {
+            background-color: #1F2937;
+            border-color: #4B5563;
+        }
+        .dark .text-muted {
+            color: #9CA3AF !important;
+        }
+        .dark .apexcharts-menu {
+            background-color: #1F2937;
+            border-color: #4B5563;
+        }
+        .dark .apexcharts-menu-item:hover {
+            background-color: #374151;
+        }
+        .dark .apexcharts-tooltip {
+            background-color: #1F2937;
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .apexcharts-tooltip-title {
+            background-color: #374151;
+            border-color: #4B5563;
+        }
+        .dark .apexcharts-xaxistooltip {
+            background-color: #1F2937;
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .apexcharts-yaxistooltip {
+            background-color: #1F2937;
+            border-color: #4B5563;
+            color: #F3F4F6;
+        }
+        .dark .apexcharts-legend-text {
+            color: #F3F4F6 !important;
+        }
+        .dark .apexcharts-gridline {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-xcrosshairs {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-ycrosshairs {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-selection-rect {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-zoom-rect {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-toolbar {
+            color: #F3F4F6;
+        }
+        .dark .apexcharts-zoomin-icon, 
+        .dark .apexcharts-zoomout-icon, 
+        .dark .apexcharts-reset-icon, 
+        .dark .apexcharts-menu-icon {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-zoomin-icon:hover, 
+        .dark .apexcharts-zoomout-icon:hover, 
+        .dark .apexcharts-reset-icon:hover, 
+        .dark .apexcharts-menu-icon:hover {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-selected {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-datalabel {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-datalabels text {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-title-text {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-subtitle-text {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-xaxis-title-text {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-yaxis-title-text {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-xaxis-label {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-yaxis-label {
+            fill: #9CA3AF;
+        }
+        .dark .apexcharts-legend-series {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-marker {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-radialbar-track {
+            stroke: #4B5563;
+        }
+        .dark .apexcharts-radialbar-hollow {
+            fill: #1F2937;
+        }
+        .dark .apexcharts-radialbar-slice {
+            stroke: #4F46E5;
+        }
+        .dark .apexcharts-pie-slice {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-pie-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-donut-slice {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-donut-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-polararea-slice {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-polararea-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-heatmap-rect {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-heatmap-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-treemap-rect {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-treemap-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-candlestick-up {
+            fill: #10B981;
+            stroke: #10B981;
+        }
+        .dark .apexcharts-candlestick-down {
+            fill: #EF4444;
+            stroke: #EF4444;
+        }
+        .dark .apexcharts-boxplot-box {
+            fill: #4F46E5;
+            stroke: #4F46E5;
+        }
+        .dark .apexcharts-boxplot-median {
+            stroke: #F3F4F6;
+        }
+        .dark .apexcharts-boxplot-whisker {
+            stroke: #9CA3AF;
+        }
+        .dark .apexcharts-boxplot-outlier {
+            fill: #EF4444;
+            stroke: #EF4444;
+        }
+        .dark .apexcharts-rangebar-range {
+            fill: #4F46E5;
+            stroke: #4F46E5;
+        }
+        .dark .apexcharts-rangebar-connector {
+            stroke: #9CA3AF;
+        }
+        .dark .apexcharts-rangebar-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-bubble {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-bubble-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-scatter-point {
+            stroke: #1F2937;
+        }
+        .dark .apexcharts-scatter-label {
+            fill: #F3F4F6;
+        }
+        .dark .apexcharts-area-series {
+            fill-opacity: 0.2;
+        }
+        .dark .apexcharts-line-series {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-bar-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-column-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-radar-series {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-polar-series {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-radialbar-series {
+            stroke-width: 8;
+        }
+        .dark .apexcharts-pie-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-donut-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-polararea-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-heatmap-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-treemap-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-candlestick-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-boxplot-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-rangebar-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-bubble-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-scatter-series {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-area-series path {
+            fill-opacity: 0.2;
+        }
+        .dark .apexcharts-line-series path {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-bar-series rect {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-column-series rect {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-radar-series polygon {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-polar-series polygon {
+            stroke-width: 2;
+        }
+        .dark .apexcharts-radialbar-series path {
+            stroke-width: 8;
+        }
+        .dark .apexcharts-pie-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-donut-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-polararea-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-heatmap-series rect {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-treemap-series rect {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-candlestick-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-boxplot-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-rangebar-series path {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-bubble-series circle {
+            stroke-width: 1;
+        }
+        .dark .apexcharts-scatter-series circle {
+            stroke-width: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white dark:bg-gray-800 shadow-md w-64 fixed h-full z-50">
+            <div class="p-4 flex items-center">
+                <div class="logo-icon bg-indigo-600 text-white p-2 rounded-lg mr-3">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <h1 class="logo-text text-xl font-bold text-indigo-600 dark:text-indigo-400">Veltrix</h1>
+                <button id="sidebarToggle" class="ml-auto text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="mt-6">
+                <div class="px-4">
+                    <div class="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-4">Navigation</div>
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#/dashboard" class="nav-link flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-tachometer-alt mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#/analytics" class="nav-link flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-chart-bar mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                                <span class="nav-text">Analytics</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#/settings" class="nav-link flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-cog mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                                <span class="nav-text">Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="px-4 mt-8">
+                    <div class="text-xs uppercase font-bold text-gray-500 dark:text-gray-400 mb-4">Other</div>
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#" class="nav-link flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-calendar-alt mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                                <span class="nav-text">Calendar</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="nav-link flex items-center p-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-envelope mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                                <span class="nav-text">Messages</span>
+                                <span class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">5</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm py-4 px-6 flex items-center justify-between">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200" id="pageTitle">Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" class="form-control pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Search...">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button id="darkModeToggle" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    <div class="relative">
+                        <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        </button>
+                    </div>
+                    <div class="dropdown relative">
+                        <button class="flex items-center space-x-2 focus:outline-none">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-8 h-8 rounded-full">
+                            <span class="text-gray-700 dark:text-gray-300 font-medium">John Doe</span>
+                            <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 text-xs"></i>
+                        </button>
+                        <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Router Outlet -->
+            <div class="router-outlet p-6">
+                <!-- Content will be dynamically loaded here -->
+                <div id="dashboard" class="page-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 mr-4">
+                                    <i class="fas fa-wallet text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Revenue</p>
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">$45,389</h3>
+                                    <p class="text-xs text-green-500 mt-1"><i class="fas fa-arrow-up mr-1"></i> 12.5% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mr-4">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Users</p>
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">12,453</h3>
+                                    <p class="text-xs text-green-500 mt-1"><i class="fas fa-arrow-up mr-1"></i> 8.2% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 mr-4">
+                                    <i class="fas fa-shopping-cart text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Orders</p>
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">4,287</h3>
+                                    <p class="text-xs text-red-500 mt-1"><i class="fas fa-arrow-down mr-1"></i> 3.7% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 mr-4">
+                                    <i class="fas fa-chart-pie text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Conversion Rate</p>
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">3.6%</h3>
+                                    <p class="text-xs text-green-500 mt-1"><i class="fas fa-arrow-up mr-1"></i> 1.2% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Revenue Overview</h4>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Sales by Category</h4>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Recent Transactions</h4>
+                                <button class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                    View All
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">#VL2456</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Jacob Hunter</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">24 Oct 2023</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">$827</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Paid</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">#VL2457</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Sofia Davis</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">23 Oct 2023</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">$1,245</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">Pending</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">#VL2458</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Mason Wilson</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">22 Oct 2023</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">$2,890</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Paid</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">#VL2459</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">Emma Thompson</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">21 Oct 2023</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">$1,890</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">Failed</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analytics" class="page-content hidden">
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Analytics Overview</h4>
+                                <div class="flex space-x-2">
+                                    <select class="form-control text-sm rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option>Last 7 Days</option>
+                                        <option>Last 30 Days</option>
+                                        <option>Last 3 Months</option>
+                                        <option>Last Year</option>
+                                    </select>
+                                    <button class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                                        Export
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="analyticsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Traffic Sources</h4>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Top Referrals</h4>
+                                <div class="dropdown relative">
+                                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
+                                            <i class="fab fa-google text-blue-600 dark:text-blue-300"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">Google</span>
+                                    </div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">2,500 visits</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-3">
+                                            <i class="fab fa-facebook-f text-purple-600 dark:text-purple-300"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">Facebook</span>
+                                    </div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">1,800 visits</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
+                                            <i class="fab fa-youtube text-red-600 dark:text-red-300"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">YouTube</span>
+                                    </div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">1,200 visits</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mr-3">
+                                            <i class="fab fa-twitter text-indigo-600 dark:text-indigo-300"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">Twitter</span>
+                                    </div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">980 visits</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
+                                            <i class="fab fa-linkedin-in text-green-600 dark:text-green-300"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">LinkedIn</span>
+                                    </div>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">750 visits</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">User Acquisition</h4>
+                                <div class="flex space-x-2">
+                                    <select class="form-control text-sm rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option>New Users</option>
+                                        <option>Returning Users</option>
+                                        <option>All Users</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="acquisitionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings" class="page-content hidden">
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-6">Profile Settings</h4>
+                            <form id="settingsForm">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                                        <input type="text" id="firstName" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" value="John">
+                                    </div>
+                                    <div>
+                                        <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                                        <input type="text" id="lastName" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" value="Doe">
+                                    </div>
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                        <input type="email" id="email" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" value="john.doe@example.com">
+                                    </div>
+                                    <div>
+                                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                        <input type="tel" id="phone" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" value="+1 (555) 123-4567">
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                                    <textarea id="bio" rows="4" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2">Senior UI/UX Designer with 8+ years of experience creating user-centered digital products.</textarea>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Picture</label>
+                                    <div class="flex items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-16 h-16 rounded-full mr-4">
+                                        <div>
+                                            <button type="button" class="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg mr-2">
+                                                Change
+                                            </button>
+                                            <button type="button" class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Social Profiles</label>
+                                    <div class="space-y-3">
+                                        <div class="flex">
+                                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+                                                <i class="fab fa-twitter mr-2"></i> Twitter
+                                            </span>
+                                            <input type="text" class="form-control flex-1 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" placeholder="username">
+                                        </div>
+                                        <div class="flex">
+                                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+                                                <i class="fab fa-facebook-f mr-2"></i> Facebook
+                                            </span>
+                                            <input type="text" class="form-control flex-1 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" placeholder="username">
+                                        </div>
+                                        <div class="flex">
+                                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+                                                <i class="fab fa-linkedin-in mr-2"></i> LinkedIn
+                                            </span>
+                                            <input type="text" class="form-control flex-1 rounded-none rounded-r-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2" placeholder="username">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Notifications</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="comments" class="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded" checked>
+                                            <label for="comments" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Comments</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="offers" class="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded" checked>
+                                            <label for="offers" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Offers</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="alerts" class="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                                            <label for="alerts" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Security alerts</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button type="button" class="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg mr-2">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-6">Change Password</h4>
+                            <form id="passwordForm">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="currentPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                                        <input type="password" id="currentPassword" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2">
+                                    </div>
+                                    <div class="md:col-span-2"></div>
+                                    <div>
+                                        <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                                        <input type="password" id="newPassword" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2">
+                                    </div>
+                                    <div>
+                                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                                        <input type="password" id="confirmPassword" class="form-control w-full rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 px-4 py-2">
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button type="button" class="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg mr-2">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                                        Update Password
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="card bg-white dark:bg-gray-800 rounded-lg p-6">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-6">Two-Factor Authentication</h4>
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h5 class="text-base font-medium text-gray-800 dark:text-gray-200">SMS Authentication</h5>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Use your phone number to receive one-time passwords</p>
+                                    </div>
+                                    <button type="button" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                                        Enable
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="text-base font-medium text-gray-800 dark:text-gray-200">Authenticator App</h5>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Use an authenticator app to generate one-time passwords</p>
+                                    </div>
+                                    <button type="button" class="text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg">
+                                        Set up
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <h5 class="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">Backup Codes</h5>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Use these one-time codes to log in if you lose access to your authentication device.</p>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center py-2 rounded font-mono text-sm">3F5G9H</div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center py-2 rounded font-mono text-sm">7K2L4M</div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center py-2 rounded font-mono text-sm">8N1P6Q</div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center py-2 rounded font-mono text-sm">2R9T7V</div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-center py-2 rounded font-mono text-sm">5W4X8Y</div>
+                                </div>
+                                <button type="button" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                    Generate new codes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        });
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Handle sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Handle dropdown menus
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            const button = dropdown.querySelector('button');
+            const menu = dropdown.querySelector('.dropdown-menu');
+
+            button.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Simple router
+        function navigateTo(hash) {
+            const pageTitle = document.getElementById('pageTitle');
+            const pages = document.querySelectorAll('.page-content');
+            
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+
+            if (hash === '#/dashboard') {
+                document.getElementById('dashboard').classList.remove('hidden');
+                pageTitle.textContent = 'Dashboard';
+            } else if (hash === '#/analytics') {
+                document.getElementById('analytics').classList.remove('hidden');
+                pageTitle.textContent = 'Analytics';
+            } else if (hash === '#/settings') {
+                document.getElementById('settings').classList.remove('hidden');
+                pageTitle.textContent = 'Settings';
+            } else {
+                // Default to dashboard
+                window.location.hash = '#/dashboard';
+                document.getElementById('dashboard').classList.remove('hidden');
+                pageTitle.textContent = 'Dashboard';
+            }
+        }
+
+        // Handle navigation links
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                navigateTo(link.getAttribute('href'));
+            });
+        });
+
+        // Handle initial page load
+        window.addEventListener('load', () => {
+            if (window.location.hash) {
+                navigateTo(window.location.hash);
+            } else {
+                navigateTo('#/dashboard');
+            }
+        });
+
+        // Handle hash changes
+        window.addEventListener('hashchange', () => {
+            navigateTo(window.location.hash);
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [5000, 7000, 8500, 7500, 9000, 12000, 11000, 13000, 15000, 14000, 16000, 18000],
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Electronics', 'Fashion', 'Home & Garden', 'Health & Beauty', 'Sports'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(129, 140, 248, 0.8)',
+                            'rgba(167, 139, 250, 0.8)',
+                            'rgba(196, 181, 253, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // Analytics Chart
+            const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
+            const analyticsChart = new Chart(analyticsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'Visitors',
+                            data: [4500, 5200, 4800, 5700, 6100, 7200, 6800],
+                            backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Page Views',
+                            data: [5200, 5800, 5400, 6200, 6700, 7800, 7300],
+                            backgroundColor: 'rgba(129, 140, 248, 0.8)',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Traffic Chart
+            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+            const trafficChart = new Chart(trafficCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Direct', 'Organic Search', 'Social', 'Referral', 'Email'],
+                    datasets: [{
+                        data: [35, 30, 15, 12, 8],
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(99, 102, 241, 0.8)',
+                            'rgba(129, 140, 248, 0.8)',
+                            'rgba(167, 139, 250, 0.8)',
+                            'rgba(196, 181, 253, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Acquisition Chart
+            const acquisitionCtx = document.getElementById('acquisitionChart').getContext('2d');
+            const acquisitionChart = new Chart(acquisitionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [
+                        {
+                            label: 'New Users',
+                            data: [3200, 3800, 4100, 3900, 4500, 5200, 4800, 5700, 6100, 6500],
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Returning Users',
+                            data: [2800, 3200, 3500, 3700, 3900, 4200, 4500, 4700, 4900, 5200],
+                            backgroundColor: 'rgba(129, 140, 248, 0.1)',
+                            borderColor: 'rgba(129, 140, 248, 1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update charts when dark mode changes
+            document.addEventListener('darkModeChanged', () => {
+                revenueChart.update();
+                categoryChart.update();
+                analyticsChart.update();
+                trafficChart.update();
+                acquisitionChart.update();
+            });
+        }
+
+        // Initialize charts when the page loads
+        window.addEventListener('load', initCharts);
+
+        // Handle form submissions
+        const settingsForm = document.getElementById('settingsForm');
+        const passwordForm = document.getElementById('passwordForm');
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Profile settings saved successfully!');
+        });
+
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            alert('Password updated successfully!');
+            passwordForm.reset();
+        });
+    </script>
+    <p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px; position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">
+    Made with ❤️ by <strong>Sandy Maher</strong>
+</p>
+
+</html>
